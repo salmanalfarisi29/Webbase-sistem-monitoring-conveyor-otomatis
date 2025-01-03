@@ -1,0 +1,197 @@
+.login_container {
+	width: 100%;
+	min-height: 100vh;
+	background-color: #f5f5f5;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 20px;
+}
+
+.login_form_container {
+	width: 100%;
+	max-width: 900px;
+	height: 500px;
+	display: flex;
+	flex-direction: row;
+	border-radius: 10px;
+	box-shadow: 0px 3px 3px -2px rgb(0 0 0 / 20%),
+		0px 3px 4px 0px rgb(0 0 0 / 14%), 0px 1px 8px 0px rgb(0 0 0 / 12%);
+	background-color: white;
+}
+
+.left {
+	flex: 2;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	padding: 20px;
+	background-color: white;
+	border-top-left-radius: 10px;
+	border-bottom-left-radius: 10px;
+}
+
+.form_container {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	width: 100%;
+}
+
+/* .form_container h1 {
+	font-size: 24px;
+	margin-top: 0;
+	color: #0056a3; /* Polman blue */
+	/* text-align: center;
+} */ 
+
+.form_container h2 {
+	font-size: 22px; /* Ukuran font sesuai keinginan */
+	margin-top: 0;
+	color: #0056a3; /* Warna biru Polman */
+	text-align: center; /* Rata tengah */
+	font-weight: bold; /* Untuk penekanan */
+}
+
+
+.input {
+	outline: none;
+	border: none;
+	width: 100%;
+	max-width: 370px;
+	padding: 15px;
+	border-radius: 10px;
+	background-color: #edf5f3;
+	margin: 10px 0;
+	font-size: 14px;
+}
+
+.error_msg {
+	width: 100%;
+	max-width: 370px;
+	padding: 15px;
+	margin: 5px 0;
+	font-size: 14px;
+	background-color: #f34646;
+	color: white;
+	border-radius: 5px;
+	text-align: center;
+}
+
+.signup_text {
+	font-size: 14px;
+	margin-top: 10px;
+	color: #333;
+}
+
+.signup_link {
+	color: #0056a3;
+	text-decoration: none;
+	font-weight: bold;
+}
+
+.signup_link:hover {
+	text-decoration: underline;
+}
+
+.blue_btn {
+	border: none;
+	outline: none;
+	padding: 12px 0;
+	background-color: #0056a3; /* Polman blue */
+	color: white;
+	border-radius: 20px;
+	width: 180px;
+	font-weight: bold;
+	font-size: 14px;
+	cursor: pointer;
+	margin-top: 10px;
+}
+
+.blue_btn:hover {
+	background-color: #004080; /* Darker Polman blue */
+}
+
+.right {
+	flex: 1;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	background: linear-gradient(270deg, #0056a3, #003f7f); /* Gradasi biru */
+	border-top-right-radius: 10px;
+	border-bottom-right-radius: 10px;
+	position: relative;
+	padding: 20px;
+}
+
+.conveyor_image {
+	width: 80%;
+	height: auto;
+	object-fit: contain;
+	border-radius: 10px;
+}
+
+/* Media Query untuk Responsif */
+@media screen and (max-width: 768px) {
+	.login_form_container {
+		flex-direction: column; /* Ubah layout menjadi kolom */
+		height: auto; /* Sesuaikan tinggi otomatis */
+		border-radius: 10px;
+	}
+
+	.left {
+		border-radius: 10px 10px 0 0; /* Hapus border kanan */
+		padding: 20px;
+	}
+
+	.right {
+		order: 2; /* Letakkan bagian kanan di bawah */
+		border-radius: 0 0 10px 10px;
+		padding: 10px;
+	}
+
+	.form_container h1 {
+		font-size: 20px; /* Kurangi ukuran font untuk layar kecil */
+	}
+
+	.input {
+		width: 90%; /* Input menyesuaikan dengan lebar layar */
+		max-width: none; /* Hapus batas maksimal */
+	}
+
+	.blue_btn {
+		width: 90%; /* Tombol menyesuaikan lebar layar */
+	}
+
+	.conveyor_image {
+		width: 100%; /* Gambar mengisi lebar layar penuh */
+		margin-top: 10px;
+	}
+}
+
+.welcome_text {
+	color: white;
+	font-size: 28px;
+	font-weight: bold;
+	text-align: center;
+	margin-top: 10px; /* Kurangi jarak */
+	margin-bottom: 5px; /* Tambahkan jarak bawah */
+}
+
+.subtext {
+	color: white;
+	font-size: 16px;
+	text-align: center;
+	margin-top: 0; /* Hilangkan jarak atas */
+	line-height: 1.5;
+}
+
+.conveyor_container {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	text-align: center;
+}
+
