@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "./styles.module.css";
 import polmanLogo from "../../assets/logoPolman.png";
@@ -6,10 +6,23 @@ import jumlahBarangIcon from "../../assets/jumlah_barang_icon.png";
 import pengaturanRpmIcon from "../../assets/pengaturan_rpm_icon.png";
 
 const AturRpm = () => {
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(window.innerWidth > 768);
   const [activePage, setActivePage] = useState("pengaturanRpm");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth <= 768) {
+        setIsSidebarOpen(false);
+      } else {
+        setIsSidebarOpen(true);
+      }
+    };
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, [])
 
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
@@ -26,11 +39,7 @@ const AturRpm = () => {
 
   const handlePageChange = (page) => {
     setActivePage(page);
-    if (page === "pengaturanRpm") {
-      navigate("/pengaturan-rpm");
-    } else if (page === "jumlahBarang") {
-      navigate("/");
-    }
+    navigate(page === "pengaturanRpm" ? "/pengaturan-rpm" : "/");
   };
 
   return (

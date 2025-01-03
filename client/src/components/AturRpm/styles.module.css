@@ -29,6 +29,7 @@ flex-direction: column;
 padding: 20px;
 box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
 transition: width 0.3s ease;
+overflow-x: hidden; /* Sembunyikan konten yang keluar */
 }
 
 .sidebar_open {
@@ -408,6 +409,57 @@ text-align: center;
 
 .cancel_btn:hover {
   background-color: #e0e0e0;
+}
+
+/* RESPONSIVE DESIGN */
+
+/* Ukuran Layar Mobile (max-width: 768px) */
+@media (max-width: 768px) {
+  .sidebar {
+    width: 60px; /* Sidebar lebih kecil */
+  }
+
+  .sidebar_open {
+    width: 180px; /* Jika terbuka */
+  }
+
+  .sidebar_closed .menu_item {
+    text-align: center;
+  }
+
+  .menu_item_active {
+    background-color: #004080;
+    padding: 10px;
+  }
+
+  .main_content {
+    padding: 10px;
+  }
+
+  .navbar {
+    padding: 10px;
+  }
+
+  .section_title {
+    font-size: 22px;
+  }
+
+  .grid_container {
+    grid-template-columns: 1fr; /* Jadi 1 kolom */
+  }
+
+  .card_container {
+    width: 100%;
+    margin-bottom: 10px;
+  }
+
+  .card_body {
+    font-size: 20px;
+  }
+
+  .reset_btn {
+    width: 100%;
+  }
 }
 
 
