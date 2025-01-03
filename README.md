@@ -3,21 +3,21 @@
 
 Web ini dikembangkan untuk memantau dan mengontrol sistem conveyor otomatis yang terintegrasi dengan ESP32. Menggunakan teknologi React.js untuk frontend dan Node.js + Express untuk backend.
 
-📝 Fitur
+📝 Fitur :
 ✅ Dashboard Monitoring: Menampilkan jumlah barang yang dihitung secara otomatis.
 ✅ Pengaturan RPM Conveyor: Mengontrol kecepatan conveyor langsung dari web.
 ✅ Notifikasi Real-time: Menggunakan Toast Notification untuk alert penting.
 ✅ Autentikasi Pengguna: Login dan registrasi user dengan JWT Authentication.
 ✅ Integrasi ESP32: Mengambil dan mengirim data ke microcontroller melalui API.
 
-📦 Teknologi yang Digunakan
+📦 Teknologi yang Digunakan :
 🔹 Frontend: React.js + React Router + Axios
 🔹 Backend: Node.js + Express.js + MongoDB
 🔹 Database: MongoDB Atlas
 🔹 Microcontroller: ESP32 (HTTP/MQTT Communication)
 🔹 Version Control: Git & GitHub
 
-📌 Instalasi dan Menjalankan Proyek
+📌 Instalasi dan Menjalankan Proyek :
 1️⃣ Clone Repository
 bash
 Copy code
@@ -39,7 +39,7 @@ npm install
 npm start
 Frontend akan berjalan di http://localhost:3000
 
-⚙️ Konfigurasi Environment Variables
+⚙️ Konfigurasi Environment Variables :
 Buat file .env di folder server/ dengan isi:
 PORT=5000
 MONGO_URI=your_mongodb_connection_string
