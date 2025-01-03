@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react"; // Tambahkan useEffect
 import { useNavigate } from "react-router-dom"; // Import useNavigate
 import styles from "./styles.module.css";
 import polmanLogo from "../../assets/logoPolman.png";
@@ -7,10 +7,21 @@ import pengaturanRpmIcon from "../../assets/pengaturan_rpm_icon.png";
 import { FaRedo, FaMapMarkerAlt } from "react-icons/fa";
 
 const Dashboard = () => {
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  // const [isSidebarOpen, setIsSidebarOpen] = useState(window.innerWidth > 768); // Jika layar kecil, sidebar tertutup
+  // const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(window.innerWidth > 768);
   const [activePage, setActivePage] = useState("jumlahBarang");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const navigate = useNavigate(); // Tambahkan useNavigate
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsSidebarOpen(window.innerWidth > 768);
+    };
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
