@@ -64,6 +64,11 @@ const Login = () => {
 								Daftar di sini
 							</Link>
 						</p>
+						{/* <p className={styles.signup_text}>
+						<a href="/forgot-password" className={styles.signup_link}>
+							Lupa Password?
+						</a>
+						</p> */}
 					</form>
 				</div>
 				<div className={styles.right}>

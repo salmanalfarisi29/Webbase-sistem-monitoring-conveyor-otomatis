@@ -3,6 +3,8 @@ import Main from "./components/Main";
 import Signup from "./components/Singup";
 import Login from "./components/Login";
 import AturRpm from "./components/AturRpm/AturRpm";
+// import ForgotPassword from "./components/ForgotPassword/ForgotPassword";
+// import ResetPassword from "./components/ResetPassword/ResetPassword"; // Pastikan ini diimport
 // import PengaturanRpm from "./components/PengaturanRpm/PengaturanRpm";
 
 function App() {
@@ -16,6 +18,8 @@ function App() {
       <Route path="/signup" exact element={<Signup />} />
       <Route path="/login" exact element={<Login />} />
       <Route path="/" element={<Navigate replace to="/login" />} />
+      {/* <Route path="/forgot-password" exact element={<ForgotPassword />} />
+      <Route path="/reset-password/:token" exact element={<ResetPassword />} /> */}
     </Routes>
   );
 }

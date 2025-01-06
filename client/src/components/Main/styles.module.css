@@ -23,7 +23,7 @@
 /* Sidebar Styling */
 .sidebar {
 width: 250px;
-background: linear-gradient(135deg, #0056a3, #003f7f); /* Gradasi biru */
+background: linear-gradient(270deg, #0056a3, #003f7f); /* Gradasi biru */
 color: white;
 display: flex;
 flex-direction: column;
@@ -118,6 +118,10 @@ margin-bottom: 20px;
     border-radius: 10px;
     box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
     overflow: hidden;
+  }
+
+  .card_container:hover {
+    box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.2); /* Tambahkan efek hover */
   }
 
   .card {
@@ -391,43 +395,6 @@ text-align: center;
   background-color: #f4f4f4;
 }
 
-/* Sidebar */
-.sidebar {
-  width: 250px;
-  background: linear-gradient(135deg, #0056a3, #003f7f);
-  color: white;
-  display: flex;
-  flex-direction: column;
-  padding: 20px;
-  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
-  transition: width 0.3s ease;
-}
-
-.sidebar_open {
-  width: 250px;
-}
-
-.sidebar_closed {
-  width: 40px;
-}
-
-.logo_section {
-  text-align: center;
-  font-size: 24px;
-  font-weight: bold;
-  margin-bottom: 20px;
-}
-
-.logo_image {
-  width: 40px;
-  height: 40px;
-}
-
-.sidebar_menu {
-  list-style: none;
-  padding: 0;
-}
-
 .menu_item {
   padding: 15px 10px;
   cursor: pointer;
@@ -510,9 +477,10 @@ text-align: center;
   text-align: center;
   height: auto; /* Sesuaikan tinggi otomatis */
 }
+/* 003f7f */
 
 .card_header {
-  background: linear-gradient(135deg, #0056a3, #003f7f); /* Gradasi biru */
+  background: linear-gradient(270deg, #0056a3, #003f7f); /* Gradasi biru */
   color: white;
   padding: 15px;
   font-size: 20px; /* Ukuran font yang sama untuk semua */
@@ -540,10 +508,17 @@ text-align: center;
   background: #ffffff;
   border: 1px solid #ccc;
   border-radius: 10px;
-  padding: 10px;
+  padding: 15px;
   text-align: center;
-  box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2); /* Tambahkan bayangan */
+  /* Efek transisi */
+  /* transition: all 0.3s ease-in-out;  */
 }
+
+.grid_item:hover {
+  box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.2); /* Tambahkan efek hover */
+}
+
 
 .grid_item h4 {
   font-size: 20px; /* Ukuran font sama dengan Jawa Timur */
