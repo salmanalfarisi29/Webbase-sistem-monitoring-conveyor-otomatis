@@ -15,6 +15,9 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server, { cors: { origin: "*" } });
 
+// **Tambahkan WebSocket `io` ke dalam `app`**
+app.set("io", io);
+
 // Database connection
 connection();
 
@@ -32,9 +35,6 @@ app.use((req, res, next) => {
     req.io = io;
     next();
 });
-
-// **Tambahkan WebSocket `io` ke dalam `app`**
-app.set("io", io);
 
 // WebSocket untuk real-time update dari ESP32
 io.on("connection", (socket) => {
@@ -71,7 +71,9 @@ changeStream.on("change", (change) => {
             const io = app.get("io");
             if (io) {
                 io.emit("update-dashboard", barangs);
-                console.log("🔄 WebSocket Emit: Data diperbarui dari MongoDB!");
+                console.log(" WebSocket Emit: Data diperbarui dari MongoDB!");
+            } else {
+                console.error(" WebSocket (io) tidak tersedia di app");
             }
         });
     }
