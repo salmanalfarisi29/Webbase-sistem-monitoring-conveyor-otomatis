@@ -160,9 +160,9 @@ const Dashboard = () => {
                         <div className={styles.grid_container}>
                             {["Bandung", "Cimahi", "Tasikmalaya", "Garut"].map((city) => (
                                 <div key={city} className={`${styles.grid_item} ${styles.interactive_card}`}>
-                                    <div className={styles.card_header}>
+                                    <h4 className={styles}>
                                         <FaMapMarkerAlt className={styles.icon} /> {city}
-                                    </div>
+                                    </h4>
                                     <div className={styles.card_body}>{barangData[city] || 0}</div>
                                     <button className={styles.reset_btn} onClick={() => openResetModal(city)}>
                                         <FaRedo /> Reset Counting
