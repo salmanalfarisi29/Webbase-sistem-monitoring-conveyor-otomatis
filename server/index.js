@@ -9,7 +9,9 @@ const connection = require("./db");
 const userRoutes = require("./routes/users");
 const authRoutes = require("./routes/auth");
 const barangRoutes = require("./routes/barang");
+const Rpm = require("./models/rpm");
 const Barang = require("./models/barang");
+const rpmRoutes = require("./routes/rpm");
 
 const app = express();
 const server = http.createServer(app);
@@ -29,6 +31,8 @@ app.use(cors());
 app.use("/api/users", userRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/barang", barangRoutes);
+app.use("/api/rpm", rpmRoutes);
+
 
 // Middleware agar API bisa mengakses WebSocket
 app.use((req, res, next) => {
@@ -39,10 +43,15 @@ app.use((req, res, next) => {
 // WebSocket untuk real-time update dari ESP32
 io.on("connection", (socket) => {
     console.log("ESP32 Connected");
-    
-    // Kirim data awal ke client
+
+    // Kirim data awal ke client untuk Barang
     Barang.find().then(data => {
         socket.emit("update-dashboard", data);
+    });
+
+    // Kirim data awal untuk RPM
+    Rpm.findOne().then((rpmData) => {
+        socket.emit("update-rpm", rpmData || { rpmValue: 0 });
     });
 
     socket.on("barang-update", async (data) => {
@@ -63,19 +72,46 @@ io.on("connection", (socket) => {
     });
 });
 
-const changeStream = Barang.watch();
+// Change Stream untuk Barang
+const barangChangeStream = Barang.watch();
 
-changeStream.on("change", (change) => {
+barangChangeStream.on("change", (change) => {
     if (change.operationType === "update") {
         Barang.find({}).then((barangs) => {
             const io = app.get("io");
             if (io) {
                 io.emit("update-dashboard", barangs);
-                console.log(" WebSocket Emit: Data diperbarui dari MongoDB!");
+                console.log("🔄 WebSocket Emit: Data Barang diperbarui dari MongoDB!");
             } else {
-                console.error(" WebSocket (io) tidak tersedia di app");
+                console.error("❌ WebSocket (io) tidak tersedia di app");
             }
         });
+    }
+});
+
+// API untuk Update RPM
+app.post("/api/rpm/update", async (req, res) => {
+    const { rpmValue } = req.body;
+
+    if (rpmValue === undefined || rpmValue < 0) {
+        return res.status(400).json({ message: "RPM value must be a positive number." });
+    }
+
+    try {
+        const updatedRpm = await Rpm.findOneAndUpdate(
+            {},
+            { rpmValue },
+            { new: true, upsert: true }
+        );
+
+        // Emit event ke semua client via WebSocket
+        io.emit("update-rpm", updatedRpm);
+        console.log(`🔄 RPM updated to ${rpmValue}`);
+
+        res.json({ message: "RPM updated successfully.", data: updatedRpm });
+    } catch (error) {
+        console.error("Error updating RPM:", error);
+        res.status(500).json({ message: "Failed to update RPM." });
     }
 });
 
