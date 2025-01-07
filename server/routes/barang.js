@@ -51,6 +51,18 @@ router.post("/reset/:wilayah", async (req, res) => {
     }
 });
 
+// API untuk mendapatkan semua data barang saat ini
+router.get("/", async (req, res) => {
+    try {
+        const barangData = await Barang.find({});
+        console.log("📦 Data barang dikirim:", barangData); // Debugging log
+        res.json(barangData);
+    } catch (error) {
+        console.error("❌ Error fetching barang:", error);
+        res.status(500).json({ message: "Failed to fetch barang data." });
+    }
+});
+
 
 // API: Atur kecepatan conveyor
 router.post("/atur-kecepatan", async (req, res) => {

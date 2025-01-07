@@ -57,21 +57,45 @@ const Dashboard = () => {
         const handleResize = () => {
             setIsSidebarOpen(window.innerWidth > 768);
         };
-
         window.addEventListener("resize", handleResize);
+    
+        // Fetch data barang saat halaman dimuat
+        const fetchInitialBarang = async () => {
+            try {
+                const response = await fetch("http://localhost:5000/api/barang");
+                const data = await response.json();
+                console.log("📦 Data barang diterima:", data); // Debugging log
+                if (response.ok) {
+                    const formattedData = {};
+                    data.forEach(({ wilayah, jumlah }) => {
+                        formattedData[wilayah] = jumlah;
+                    });
+                    setBarangData(formattedData);
+                }
+            } catch (error) {
+                console.error("❌ Error fetching barang:", error);
+            }
+        };
+    
+        fetchInitialBarang();
+    
+        // WebSocket Update
         socket.on("update-dashboard", (data) => {
-            const updatedData = {};
-            data.forEach(({ wilayah, jumlah }) => {
-                updatedData[wilayah] = jumlah;
-            });
-            setBarangData(updatedData);
+            console.log("🔄 WebSocket Update:", data);
+            if (data) {
+                const updatedData = {};
+                data.forEach(({ wilayah, jumlah }) => {
+                    updatedData[wilayah] = jumlah;
+                });
+                setBarangData(updatedData);
+            }
         });
-
+    
         return () => {
             window.removeEventListener("resize", handleResize);
             socket.off("update-dashboard");
         };
-    }, []);
+    }, []);    
 
     const toggleSidebar = () => {
         setIsSidebarOpen(!isSidebarOpen);
