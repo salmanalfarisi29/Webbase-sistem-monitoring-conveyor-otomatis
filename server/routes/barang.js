@@ -29,21 +29,20 @@ router.get("/", async (req, res) => {
 
 // API: Reset jumlah barang di wilayah tertentu
 router.post("/reset/:wilayah", async (req, res) => {
+    const { wilayah } = req.params;
     try {
-        const { wilayah } = req.params;
+        // Reset jumlah barang di database
+        await Barang.updateOne({ wilayah }, { jumlah: 0 });
 
-        // Update jumlah barang menjadi 0 di wilayah tertentu
-        const result = await Barang.updateOne(
-            { wilayah },
-            { $set: { jumlah: 0 } },
-            { upsert: true } // Jika data belum ada, otomatis buat baru
-        );
+        // Kirim update ke semua client melalui WebSocket
+        const updatedData = await Barang.find({});
+        req.app.io.emit("update-dashboard", updatedData);
 
-        console.log(`Jumlah barang di wilayah ${wilayah} telah direset.`);
+        console.log(`🔄 Jumlah barang di ${wilayah} telah direset.`);
         res.json({ message: `Jumlah barang di wilayah ${wilayah} telah direset.` });
-    } catch (err) {
-        console.error("Error saat reset barang:", err);
-        res.status(500).json({ error: err.message });
+    } catch (error) {
+        console.error("Error resetting barang:", error);
+        res.status(500).json({ message: "Gagal mereset barang." });
     }
 });
 

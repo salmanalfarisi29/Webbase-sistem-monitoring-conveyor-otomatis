@@ -33,14 +33,48 @@ app.use((req, res, next) => {
     next();
 });
 
+// **Tambahkan WebSocket `io` ke dalam `app`**
+app.set("io", io);
+
 // WebSocket untuk real-time update dari ESP32
 io.on("connection", (socket) => {
     console.log("ESP32 Connected");
     
+    // Kirim data awal ke client
+    Barang.find().then(data => {
+        socket.emit("update-dashboard", data);
+    });
+
     socket.on("barang-update", async (data) => {
         await Barang.updateOne({ wilayah: data.wilayah }, { jumlah: data.jumlah }, { upsert: true });
-        io.emit("update-dashboard", data);
+        const updatedData = await Barang.find();
+        io.emit("update-dashboard", updatedData);
     });
+
+    // Handle Reset Counting
+    socket.on("reset-counting", async ({ wilayah }) => {
+        await Barang.updateOne({ wilayah }, { $set: { jumlah: 0 } });
+        const updatedData = await Barang.find();
+        io.emit("update-dashboard", updatedData);
+    });
+
+    socket.on("disconnect", () => {
+        console.log("ESP32 Disconnected");
+    });
+});
+
+const changeStream = Barang.watch();
+
+changeStream.on("change", (change) => {
+    if (change.operationType === "update") {
+        Barang.find({}).then((barangs) => {
+            const io = app.get("io");
+            if (io) {
+                io.emit("update-dashboard", barangs);
+                console.log("🔄 WebSocket Emit: Data diperbarui dari MongoDB!");
+            }
+        });
+    }
 });
 
 const port = process.env.PORT || 5000;
