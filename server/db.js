@@ -12,4 +12,13 @@ module.exports = () => {
 		console.log(error);
 		console.log("Could not connect database!");
 	}
+
+	mongoose.connection.once('open', async () => {
+		console.log("✅ Connected to database:", mongoose.connection.name);
+	
+		// Cek daftar koleksi dalam database
+		const collections = await mongoose.connection.db.listCollections().toArray();
+		console.log("📂 Koleksi dalam database:", collections.map(col => col.name));
+	});
+	
 };
