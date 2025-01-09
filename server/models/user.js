@@ -18,6 +18,7 @@ userSchema.methods.generateAuthToken = function () {
     console.log("Generating token with JWTPRIVATEKEY:", process.env.JWTPRIVATEKEY); // Debugging log
     const token = jwt.sign({ _id: this._id }, process.env.JWTPRIVATEKEY, { // Membuat token berbasis user ID
         expiresIn: "7d", // Token berlaku selama 7 hari
+        // expiresIn: "1m", // Token berlaku selama 1 menit
     });
     return token; // Mengembalikan token
 };

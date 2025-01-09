@@ -1,9 +1,10 @@
 const express = require("express"); // Mengimpor framework Express.js
 const router = express.Router(); // Membuat instance router
 const Rpm = require("../models/rpm"); // Mengimpor model RPM dari database
+const auth = require("../middleware/auth"); // Mengimpor middleware autentikasi
 
 // API: Update nilai RPM
-router.post("/update", async (req, res) => {
+router.post("/update", auth, async (req, res) => {
     const { rpmValue } = req.body; // Mengambil nilai RPM dari request body
 
     // Validasi: Pastikan nilai RPM ada dan tidak negatif
@@ -32,7 +33,7 @@ router.post("/update", async (req, res) => {
 });
 
 // API: Ambil nilai RPM saat ini
-router.get("/", async (req, res) => {
+router.get("/", auth, async (req, res) => {
     try {
         const rpmData = await Rpm.findOne(); // Mengambil nilai RPM dari database
         res.json(rpmData || { rpmValue: 0 }); // Jika belum ada data, kembalikan 0 sebagai default

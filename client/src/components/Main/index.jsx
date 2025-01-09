@@ -6,6 +6,7 @@ import polmanLogo from "../../assets/logoPolman.png";
 import jumlahBarangIcon from "../../assets/jumlah_barang_icon.png";
 import pengaturanRpmIcon from "../../assets/pengaturan_rpm_icon.png";
 import { FaRedo, FaMapMarkerAlt } from "react-icons/fa";
+import useAuthCheck from "../../hooks/useAuthCheck"; // Gunakan path relatif dari folder `components`
 
 const socket = io("http://localhost:5000");
 
@@ -17,6 +18,7 @@ const Dashboard = () => {
     const [isResetModalOpen, setIsResetModalOpen] = useState(false);
     const [selectedWilayah, setSelectedWilayah] = useState("");
     const navigate = useNavigate();
+    useAuthCheck(); // Cek apakah token masih valid sebelum render halaman
 
     const openResetModal = (wilayah) => {
       setSelectedWilayah(wilayah);
@@ -32,9 +34,12 @@ const Dashboard = () => {
       if (!selectedWilayah) return;
   
       fetch(`http://localhost:5000/api/barang/reset/${selectedWilayah}`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-      })
+        method: "POST",
+        headers: { 
+            "Content-Type": "application/json",
+            "x-auth-token": localStorage.getItem("token") // Tambahkan token
+            }
+        })
           .then((response) => response.json())
           .then((data) => {
               console.log("Reset sukses:", data);

@@ -5,6 +5,7 @@ import styles from "./styles.module.css";
 import polmanLogo from "../../assets/logoPolman.png";
 import jumlahBarangIcon from "../../assets/jumlah_barang_icon.png";
 import pengaturanRpmIcon from "../../assets/pengaturan_rpm_icon.png";
+import useAuthCheck from "../../hooks/useAuthCheck"; // Gunakan path relatif dari folder `components`
 
 const socket = io("http://localhost:5000");
 
@@ -15,6 +16,7 @@ const AturRpm = () => {
   const [rpmValue, setRpmValue] = useState(0);
   const [inputRpm, setInputRpm] = useState("");
   const navigate = useNavigate();
+  useAuthCheck(); // Cek apakah token masih valid sebelum render halaman
 
   useEffect(() => {
         const handleResize = () => {
@@ -24,12 +26,16 @@ const AturRpm = () => {
 
         // Fetch data awal RPM dari API
         const fetchInitialRpm = async () => {
-            try {
-                const response = await fetch("http://localhost:5000/api/rpm");
-                const data = await response.json();
-                if (response.ok && data.rpmValue !== undefined) {
-                    setRpmValue(data.rpmValue);
+          try {
+            const response = await fetch("http://localhost:5000/api/rpm", {
+                headers: {
+                    "x-auth-token": localStorage.getItem("token"), // Pastikan token dikirim
                 }
+            });
+            if (!response.ok) throw new Error("Gagal mengambil data RPM");
+            
+            const data = await response.json();
+            setRpmValue(data.rpmValue); // Simpan nilai RPM yang didapat
             } catch (error) {
                 console.error("Error fetching initial RPM:", error);
             }
@@ -76,8 +82,11 @@ const AturRpm = () => {
       try {
         const response = await fetch("http://localhost:5000/api/rpm/update", {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ rpmValue: newRpm }),
+          headers: { 
+              "Content-Type": "application/json",
+              "x-auth-token": localStorage.getItem("token") // Ambil token dari localStorage
+          },
+          body: JSON.stringify({ rpmValue: newRpm })
         });
         const data = await response.json();
         if (response.ok) {

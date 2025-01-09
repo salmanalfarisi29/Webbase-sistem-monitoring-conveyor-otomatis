@@ -1,6 +1,7 @@
 const express = require("express"); // Mengimpor framework Express.js
 const Barang = require("../models/barang"); // Mengimpor model Barang dari database
 const mongoose = require("mongoose"); // Mengimpor mongoose untuk koneksi ke MongoDB
+const auth = require("../middleware/auth");
 
 const router = express.Router(); // Membuat instance router untuk menangani rute barang
 
@@ -26,7 +27,7 @@ router.get("/", async (req, res) => {
 });
 
 // API: Reset jumlah barang di wilayah tertentu
-router.post("/reset/:wilayah", async (req, res) => {
+router.post("/reset/:wilayah", auth, async (req, res) => {
     const { wilayah } = req.params; // Mengambil parameter wilayah dari URL
 
     try {
