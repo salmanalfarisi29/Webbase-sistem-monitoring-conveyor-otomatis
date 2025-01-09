@@ -1,37 +1,40 @@
-const mongoose = require("mongoose");
-const jwt = require("jsonwebtoken");
-const Joi = require("joi");
-const passwordComplexity = require("joi-password-complexity");
+const mongoose = require("mongoose"); // Mengimpor mongoose untuk mengelola model database
+const jwt = require("jsonwebtoken"); // Mengimpor JWT untuk membuat token autentikasi
+const Joi = require("joi"); // Mengimpor Joi untuk validasi data pengguna
+const passwordComplexity = require("joi-password-complexity"); // Validasi password agar lebih aman
 
+// Membuat schema (struktur data) untuk menyimpan informasi user dalam database
 const userSchema = new mongoose.Schema({
-    firstName: { type: String, required: true },
-    lastName: { type: String, required: true },
-    email: { type: String, required: true, unique: true },
-    password: { type: String, required: true },
-    resetToken: { type: String, default: null }, // Token untuk reset password
-    resetTokenExpiry: { type: Date, default: null }, // Expiry token reset password
+    firstName: { type: String, required: true }, // Nama depan user (wajib diisi)
+    lastName: { type: String, required: true }, // Nama belakang user (wajib diisi)
+    email: { type: String, required: true, unique: true }, // Email user (wajib unik dan diisi)
+    password: { type: String, required: true }, // Password user (wajib diisi dan akan di-hash sebelum disimpan)
+    resetToken: { type: String, default: null }, // Token reset password jika user lupa password
+    resetTokenExpiry: { type: Date, default: null }, // Waktu kadaluarsa token reset password
 });
 
-// Generate JWT Token untuk autentikasi
+// **Membuat metode untuk menghasilkan JWT (JSON Web Token)**
 userSchema.methods.generateAuthToken = function () {
-    console.log("Generating token with JWTPRIVATEKEY:", process.env.JWTPRIVATEKEY);
-    const token = jwt.sign({ _id: this._id }, process.env.JWTPRIVATEKEY, {
-        expiresIn: "7d",
+    console.log("Generating token with JWTPRIVATEKEY:", process.env.JWTPRIVATEKEY); // Debugging log
+    const token = jwt.sign({ _id: this._id }, process.env.JWTPRIVATEKEY, { // Membuat token berbasis user ID
+        expiresIn: "7d", // Token berlaku selama 7 hari
     });
-    return token;
+    return token; // Mengembalikan token
 };
 
+// Membuat model `User` berdasarkan schema `userSchema`
 const User = mongoose.model("user", userSchema);
 
-// Validasi data registrasi
+// **Fungsi Validasi Data Registrasi**
 const validate = (data) => {
     const schema = Joi.object({
-        firstName: Joi.string().required().label("First Name"),
-        lastName: Joi.string().required().label("Last Name"),
-        email: Joi.string().email().required().label("Email"),
-        password: passwordComplexity().required().label("Password"),
+        firstName: Joi.string().required().label("First Name"), // Nama depan wajib diisi
+        lastName: Joi.string().required().label("Last Name"), // Nama belakang wajib diisi
+        email: Joi.string().email().required().label("Email"), // Email wajib diisi dan harus dalam format email
+        password: passwordComplexity().required().label("Password"), // Password harus kompleks (huruf besar, kecil, angka, dan simbol)
     });
-    return schema.validate(data);
+    return schema.validate(data); // Mengembalikan hasil validasi
 };
 
+// Mengekspor model `User` dan fungsi validasi agar bisa digunakan di aplikasi lain
 module.exports = { User, validate };

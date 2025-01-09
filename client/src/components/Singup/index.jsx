@@ -1,41 +1,54 @@
+// Mengimpor useState untuk mengelola state dalam React
 import { useState } from "react";
+// Mengimpor axios untuk mengirim request ke backend API
 import axios from "axios";
+// Mengimpor Link untuk navigasi dan useNavigate untuk redirect setelah registrasi sukses
 import { Link, useNavigate } from "react-router-dom";
+// Mengimpor CSS module untuk styling halaman Signup
 import styles from "./styles.module.css";
+// Mengimpor gambar animasi conveyor untuk tampilan halaman
 import animConveyor from "../../assets/animConveyor.png";
 
-const Signup = () => {
-	const [data, setData] = useState({
-		firstName: "",
-		lastName: "",
-		email: "",
-		password: "",
-	});
-	const [error, setError] = useState("");
-	const [isModalOpen, setIsModalOpen] = useState(false); // Modal kontrol
-	const navigate = useNavigate();
 
+const Signup = () => {
+    // State untuk menyimpan input user (Nama Depan, Nama Belakang, Email, Password)
+    const [data, setData] = useState({
+        firstName: "",
+        lastName: "",
+        email: "",
+        password: "",
+    });
+    // State untuk menyimpan pesan error jika registrasi gagal
+    const [error, setError] = useState("");
+    // State untuk mengontrol tampilan modal setelah registrasi berhasil
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    // Hook untuk navigasi ke halaman lain setelah registrasi sukses
+    const navigate = useNavigate();
+	// Fungsi untuk update input user
 	const handleChange = ({ currentTarget: input }) => {
 		setData({ ...data, [input.name]: input.value });
 	};
 
 	const handleSubmit = async (e) => {
-		e.preventDefault();
+		e.preventDefault(); // Mencegah reload halaman setelah submit
 		try {
+			// URL API untuk registrasi user (diambil dari environment variable)
 			const url = `${process.env.REACT_APP_API_URL}/api/users`;
+	
+			// Mengirim data registrasi ke server menggunakan Axios
 			const { data: res } = await axios.post(url, data);
 			console.log("Data dari server:", res);
-			setIsModalOpen(true); // Tampilkan modal setelah berhasil
+	
+			// Jika berhasil, tampilkan modal
+			setIsModalOpen(true);
 		} catch (error) {
-			if (
-				error.response &&
-				error.response.status >= 400 &&
-				error.response.status <= 500
-			) {
+			// Jika terjadi error, tampilkan pesan error
+			if (error.response && error.response.status >= 400 && error.response.status <= 500) {
 				setError(error.response.data.message);
 			}
 		}
 	};
+	
 
 	const handleCloseModal = () => {
 		setIsModalOpen(false); // Tutup modal

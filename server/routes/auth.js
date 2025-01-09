@@ -1,45 +1,97 @@
-const router = require("express").Router();
-const { User } = require("../models/user");
-const bcrypt = require("bcrypt");
-const Joi = require("joi");
-const nodemailer = require("nodemailer");
-const crypto = require("crypto"); // Pastikan ini ada di atas
-require("dotenv").config();
+const router = require("express").Router(); // Mengimpor Router dari Express untuk menangani rute API
+const { User } = require("../models/user"); // Mengimpor model User dari database
+const bcrypt = require("bcrypt"); // Mengimpor bcrypt untuk hashing password
+const Joi = require("joi"); // Mengimpor Joi untuk validasi input
+const nodemailer = require("nodemailer"); // Mengimpor nodemailer untuk mengirim email
+const crypto = require("crypto"); // Mengimpor crypto untuk membuat token reset password
+require("dotenv").config(); // Memuat variabel lingkungan dari file .env
 
+// **API: Login pengguna**
 router.post("/", async (req, res) => {
     try {
-        // Tambahkan log untuk debugging
-        console.log("Login request body:", req.body);
+        console.log("Login request body:", req.body); // Debugging: mencetak data request login
 
-        const { error } = validate(req.body);
+        const { error } = validate(req.body); // Validasi input email dan password
         if (error)
-            return res.status(400).send({ message: error.details[0].message });
+            return res.status(400).send({ message: error.details[0].message }); // Jika validasi gagal, kirim status 400
 
-        const user = await User.findOne({ email: req.body.email });
+        const user = await User.findOne({ email: req.body.email }); // Cari user berdasarkan email di database
         if (!user)
-            return res.status(401).send({ message: "Invalid Email or Password" });
+            return res.status(401).send({ message: "Invalid Email or Password" }); // Jika user tidak ditemukan, kirim status 401
 
-        const validPassword = await bcrypt.compare(
-            req.body.password,
-            user.password
-        );
+        const validPassword = await bcrypt.compare(req.body.password, user.password); // Bandingkan password yang diinput dengan yang ada di database
         if (!validPassword)
-            return res.status(401).send({ message: "Invalid Email or Password" });
+            return res.status(401).send({ message: "Invalid Email or Password" }); // Jika password salah, kirim status 401
 
-        const token = user.generateAuthToken();
-        res.status(200).send({ data: token, message: "logged in successfully" });
+        const token = user.generateAuthToken(); // Membuat token autentikasi untuk sesi pengguna
+        res.status(200).send({ data: token, message: "Logged in successfully" }); // Kirim token ke client sebagai tanda login sukses
     } catch (error) {
-        res.status(500).send({ message: "Internal Server Error" });
+        res.status(500).send({ message: "Internal Server Error" }); // Jika terjadi kesalahan server, kirim status 500
     }
 });
 
+// **Fungsi validasi input login menggunakan Joi**
 const validate = (data) => {
 	const schema = Joi.object({
-		email: Joi.string().email().required().label("Email"),
-		password: Joi.string().required().label("Password"),
+		email: Joi.string().email().required().label("Email"), // Email harus berformat email dan wajib diisi
+		password: Joi.string().required().label("Password"), // Password wajib diisi
 	});
-	return schema.validate(data);
+	return schema.validate(data); // Jalankan validasi dan kembalikan hasilnya
 };
+
+// **API: Lupa password**
+router.post("/forgot-password", async (req, res) => {
+    try {
+        const user = await User.findOne({ email: req.body.email }); // Cari user berdasarkan email
+        if (!user) return res.status(400).send({ message: "Email tidak ditemukan" }); // Jika tidak ditemukan, kirim status 400
+
+        const resetToken = crypto.randomBytes(32).toString("hex"); // Buat token reset password acak
+        user.resetToken = resetToken; // Simpan token dalam database
+        user.resetTokenExpiry = new Date(Date.now() + 3600000); // Berlaku selama 1 jam
+        await user.save(); // Simpan perubahan di database
+
+        console.log("📌 Token yang disimpan:", resetToken); // Debugging: mencetak token di console
+        console.log("🔗 Link reset yang dikirim:", `http://localhost:3000/reset-password/${resetToken}`); // Debugging: mencetak link reset
+
+        res.send({ message: "Gunakan link di email untuk reset password" }); // Kirim response ke client
+    } catch (error) {
+        console.error("🔥 Error:", error); // Jika terjadi error, tampilkan di console
+        res.status(500).send({ message: "Internal Server Error" }); // Kirim status 500 jika terjadi error
+    }
+});
+
+// **API: Reset password menggunakan token**
+router.post("/reset-password", async (req, res) => {
+    try {
+        console.log("🛠 Token diterima:", req.body.token.trim()); // Debugging: mencetak token yang diterima dari request
+        console.log("⌛ Waktu Sekarang:", new Date().toISOString()); // Debugging: mencetak waktu sekarang
+
+        const user = await User.findOne({
+            resetToken: req.body.token.trim(), // Cari user berdasarkan token reset
+            resetTokenExpiry: { $gt: new Date() } // Token harus masih berlaku
+        });
+
+        if (!user) {
+            console.log("❌ Token tidak ditemukan atau sudah expired"); // Jika token tidak valid atau expired, tampilkan pesan di console
+            return res.status(400).send({ message: "Token tidak valid atau telah kedaluwarsa." }); // Kirim status 400
+        }
+
+        console.log("✅ Token valid! Mengubah password..."); // Jika token valid, lanjut ke proses reset password
+        const salt = await bcrypt.genSalt(10); // Buat salt untuk enkripsi password
+        user.password = await bcrypt.hash(req.body.newPassword, salt); // Hash password baru
+        user.resetToken = null; // Hapus token reset setelah digunakan
+        user.resetTokenExpiry = null; // Hapus waktu kedaluwarsa token
+        await user.save(); // Simpan perubahan di database
+
+        res.send({ message: "Password berhasil diubah!" }); // Kirim response sukses
+    } catch (error) {
+        console.error("🔥 Error:", error); // Jika terjadi error, tampilkan di console
+        res.status(500).send({ message: "Internal Server Error" }); // Kirim status 500
+    }
+});
+
+module.exports = router; // Mengekspor router agar dapat digunakan di aplikasi utama
+
 
 // router.post("/forgot-password", async (req, res) => {
 //     try {
@@ -125,61 +177,3 @@ const validate = (data) => {
 // };
 // KHUSUS RESET PASSWORD MENGGUNAKAN TOKEN
 
-router.post("/forgot-password", async (req, res) => {
-    try {
-        const user = await User.findOne({ email: req.body.email });
-        if (!user) return res.status(400).send({ message: "Email tidak ditemukan" });
-
-        // Buat token reset password
-        const resetToken = crypto.randomBytes(32).toString("hex");
-        user.resetToken = resetToken; // Jangan hash token
-        user.resetTokenExpiry = new Date(Date.now() + 3600000); // Berlaku 1 jam
-        await user.save();
-
-        console.log("📌 Token yang disimpan:", resetToken);
-        console.log("🔗 Link reset yang dikirim:", `http://localhost:3000/reset-password/${resetToken}`);
-        console.log("⌛ Expiry Token:", user.resetTokenExpiry.toISOString());
-
-        res.send({ message: "Gunakan link di email untuk reset password" });
-
-    } catch (error) {
-        console.error("🔥 Error:", error);
-        res.status(500).send({ message: "Internal Server Error" });
-    }
-});
-
-router.post("/reset-password", async (req, res) => {
-    try {
-        console.log("🛠 Token diterima:", req.body.token.trim()); // Trim untuk menghapus spasi
-        console.log("⌛ Waktu Sekarang:", new Date().toISOString());
-
-        // Lihat semua token yang tersimpan sebelum mencari
-        const allUsers = await User.find({}, { resetToken: 1, _id: 0 });
-        console.log("📌 Semua token dalam database:", allUsers);
-
-        const user = await User.findOne({
-            resetToken: req.body.token.trim(), // Pastikan token yang dicari sama dengan yang dikirim
-            resetTokenExpiry: { $gt: new Date() }
-        });
-
-        if (!user) {
-            console.log("❌ Token tidak ditemukan atau sudah expired");
-            return res.status(400).send({ message: "Token tidak valid atau telah kedaluwarsa." });
-        }
-
-        console.log("✅ Token valid! Mengubah password...");
-        const salt = await bcrypt.genSalt(10);
-        user.password = await bcrypt.hash(req.body.newPassword, salt);
-        user.resetToken = null;
-        user.resetTokenExpiry = null;
-        await user.save();
-
-        res.send({ message: "Password berhasil diubah!" });
-
-    } catch (error) {
-        console.error("🔥 Error:", error);
-        res.status(500).send({ message: "Internal Server Error" });
-    }
-});
-
-module.exports = router;
