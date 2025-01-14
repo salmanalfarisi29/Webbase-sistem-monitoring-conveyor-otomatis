@@ -6,6 +6,7 @@ import Main from "./components/Main";
 import Signup from "./components/Singup";
 import Login from "./components/Login";
 import AturRpm from "./components/AturRpm/AturRpm";
+import BarangBelumDisortir from "./components/BarangUnsorted/unsortedItemList";
 
 // Komponen utama React yang mengatur navigasi dan halaman utama.
 function App() {
@@ -19,6 +20,8 @@ function App() {
 
       {/* Jika user sudah login, maka halaman "/pengaturan-rpm" akan menampilkan komponen AturRpm */}
       {user && <Route path="/pengaturan-rpm" exact element={<AturRpm />} />}
+
+      {user && <Route path="/barang-belum-disortir" exact element={<BarangBelumDisortir />} />}
 
       {/* Jika user belum login, maka diarahkan ke halaman "/login" */}
       <Route path="/signup" exact element={<Signup />} />
