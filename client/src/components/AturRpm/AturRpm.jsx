@@ -5,6 +5,7 @@ import styles from "./styles.module.css";
 import polmanLogo from "../../assets/logoPolman.png";
 import jumlahBarangIcon from "../../assets/jumlah_barang_icon.png";
 import pengaturanRpmIcon from "../../assets/pengaturan_rpm_icon.png";
+import barangBelumDisortirIcon from "../../assets/barangBelumDisortirIcon.png";
 import useAuthCheck from "../../hooks/useAuthCheck"; // Gunakan path relatif dari folder `components`
 
 const socket = io("http://localhost:5000");
@@ -72,7 +73,13 @@ const AturRpm = () => {
 
   const handlePageChange = (page) => {
     setActivePage(page);
-    navigate(page === "pengaturanRpm" ? "/pengaturan-rpm" : "/");
+    if (page === "pengaturanRpm") {
+        navigate("/pengaturan-rpm");
+    } else if (page === "jumlahBarang") {
+        navigate("/");
+    } else if (page === "barangBelumDisortir") {
+        navigate("/barang-belum-disortir"); 
+    }
   };
 
   const updateRpm = async (event) => {
@@ -112,11 +119,29 @@ const AturRpm = () => {
           )}
         </div>
         <ul className={styles.sidebar_menu}>
-          <li className={`${styles.menu_item} ${isSidebarOpen && activePage === "jumlahBarang" ? styles.menu_item_active : ""}`} onClick={() => handlePageChange("jumlahBarang")}>
-            {isSidebarOpen ? "Jumlah Barang" : <img src={jumlahBarangIcon} alt="Jumlah Barang" className={styles.menu_icon} />}
+          <li
+              className={`${styles.menu_item} ${
+                  isSidebarOpen && activePage === "jumlahBarang" ? styles.menu_item_active : ""
+              }`}
+              onClick={() => handlePageChange("jumlahBarang")}
+          >
+              {isSidebarOpen ? "Barang yang Telah Disortir" : <img src={jumlahBarangIcon} alt="Jumlah Barang" className={styles.menu_icon} />}
           </li>
-          <li className={`${styles.menu_item} ${isSidebarOpen && activePage === "pengaturanRpm" ? styles.menu_item_active : ""}`} onClick={() => handlePageChange("pengaturanRpm")}>
-            {isSidebarOpen ? "Pengaturan RPM" : <img src={pengaturanRpmIcon} alt="Pengaturan RPM" className={styles.menu_icon} />}
+          <li
+              className={`${styles.menu_item} ${
+                  isSidebarOpen && activePage === "barangBelumDisortir" ? styles.menu_item_active : ""
+              }`}
+              onClick={() => handlePageChange("barangBelumDisortir")}
+          >
+              {isSidebarOpen ? "Barang yang Belum Disortir" : <img src={barangBelumDisortirIcon} alt="Barang yang Belum Disortir" className={styles.menu_icon} />}
+          </li>
+          <li
+              className={`${styles.menu_item} ${
+                  isSidebarOpen && activePage === "pengaturanRpm" ? styles.menu_item_active : ""
+              }`}
+              onClick={() => handlePageChange("pengaturanRpm")}
+          >
+              {isSidebarOpen ? "Pengaturan RPM" : <img src={pengaturanRpmIcon} alt="Pengaturan RPM" className={styles.menu_icon} />}
           </li>
         </ul>
       </aside>

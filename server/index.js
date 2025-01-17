@@ -13,9 +13,13 @@ const connection = require("./db"); // Mengimpor konfigurasi koneksi ke MongoDB 
 const userRoutes = require("./routes/users"); // Mengimpor routes untuk pengguna (user)
 const authRoutes = require("./routes/auth"); // Mengimpor routes untuk autentikasi user
 const barangRoutes = require("./routes/barang"); // Mengimpor routes untuk data barang
+const sortRoutes = require("./routes/sort");
+
 const Rpm = require("./models/rpm"); // Mengimpor model database untuk menyimpan data RPM conveyor
 const Barang = require("./models/barang"); // Mengimpor model database untuk menyimpan data barang
 const rpmRoutes = require("./routes/rpm"); // Mengimpor routes untuk mengelola data RPM
+const unsortedRoutes = require("./routes/unsorted");
+const UnsortedItem = require("./models/unsortedItem");
 
 const app = express(); // Membuat instance aplikasi Express.js
 const server = http.createServer(app); // Membuat server HTTP menggunakan Express
@@ -34,6 +38,9 @@ app.use("/api/users", userRoutes); // Menggunakan route user pada endpoint '/api
 app.use("/api/auth", authRoutes); // Menggunakan route autentikasi pada endpoint '/api/auth'
 app.use("/api/barang", barangRoutes); // Menggunakan route barang pada endpoint '/api/barang'
 app.use("/api/rpm", rpmRoutes); // Menggunakan route RPM pada endpoint '/api/rpm'
+app.use("/api/unsorted", unsortedRoutes);
+// app.use("/api/sort", sortRoutes);
+app.use("/api", sortRoutes);
 
 // Middleware untuk menyisipkan WebSocket `io` ke dalam setiap request API
 app.use((req, res, next) => {  
@@ -43,6 +50,40 @@ app.use((req, res, next) => {
 
 // WebSocket: Menangani komunikasi real-time dengan ESP32
 io.on("connection", (socket) => {
+    console.log("📡 Client connected to WebSocket");
+
+    // Kirim data barang yang belum disortir saat client pertama kali terhubung
+    UnsortedItem.find({ status: "Belum Disortir" }).then(data => {
+        socket.emit("update-unsorted", data);
+    });
+
+    // Event: Ketika barcode dipindai oleh conveyor otomatis (via ESP32)
+    socket.on("barcode-scanned", async (barcode) => {
+        try {
+            const updatedItem = await UnsortedItem.findOneAndUpdate(
+                { barcode }, 
+                { status: "Tersortir" }, 
+                { new: true }
+            );
+
+            if (updatedItem) {
+                console.log(`✅ Barang dengan barcode ${barcode} telah disortir!`);
+
+                // Kirim data baru ke semua client agar tampilan diperbarui
+                const updatedItems = await UnsortedItem.find({ status: "Belum Disortir" });
+                io.emit("update-unsorted", updatedItems);
+            } else {
+                console.log(`❌ Barang dengan barcode ${barcode} tidak ditemukan!`);
+            }
+        } catch (error) {
+            console.error("❌ Error dalam proses sortir barang:", error);
+        }
+    });
+
+    socket.on("disconnect", () => {
+        console.log("Client disconnected from WebSocket");
+    });
+
     console.log("ESP32 Connected"); // Log saat ESP32 terhubung ke server
 
     // Mengirimkan data barang terbaru saat client pertama kali terhubung
@@ -93,6 +134,30 @@ barangChangeStream.on("change", (change) => {
         });
     }
 });
+
+// **MongoDB Change Stream untuk UnsortedItems**
+const unsortedItemsChangeStream = UnsortedItem.watch();
+
+// Event listener: Akan dipicu ketika ada perubahan dalam koleksi 'unsorteditems'
+unsortedItemsChangeStream.on("change", (change) => {
+    console.log("Perubahan terdeteksi di koleksi UnsortedItems:", change);
+
+    // Ambil data terbaru dari koleksi 'unsorteditems'
+    UnsortedItem.find({})
+        .then((unsortedItems) => {
+            const io = app.get("io"); // Mengambil instance WebSocket dari Express app
+            if (io) {
+                io.emit("update-unsorted", unsortedItems); // Kirim data terbaru ke semua client
+                console.log("WebSocket Emit: Data UnsortedItems diperbarui dari MongoDB!");
+            } else {
+                console.error("WebSocket (io) tidak tersedia di app");
+            }
+        })
+        .catch((error) => {
+            console.error("Error fetching updated unsorted items:", error);
+        });
+});
+
 
 // **API untuk Update RPM**
 app.post("/api/rpm/update", async (req, res) => {    

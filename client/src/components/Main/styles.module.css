@@ -78,28 +78,42 @@ flex-direction: column;
 overflow-y: auto;
 }
 
-.navbar {
+/* .navbar {
   background-color: #ffffff;
-  padding: 5px 17px; /* Perkecil padding untuk memperpendek tinggi */
+  padding: 5px 17px;
   box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  height: 65px; /* Tentukan tinggi spesifik yang lebih pendek */
-}
-
+  height: 65px;
+} */
 
 .toggle_btn {
-background-color: #0056a3;
-color: white;
-padding: 10px;
-border: none;
-border-radius: 5px;
-cursor: pointer;
+  background-color: #0056a3;
+  color: white;
+  padding: 10px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
 }
 
 .toggle_btn:hover {
-background-color: #003f7f;
+  background-color: #003f7f;
+}
+
+.logout_btn {
+  background-color: #0056a3;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.3s ease;
+}
+
+.logout_btn:hover {
+  background-color: #003f7f;
 }
 
 .content_area {
@@ -415,15 +429,15 @@ text-align: center;
 }
 
 /* Navbar */
-/* .navbar {
+.navbar {
   background-color: #ffffff;
-  padding: 10px 20px;
+  padding: 20px;
   box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
   display: flex;
   align-items: center;
   justify-content: space-between;
   height: 65px;
-} */
+}
 
 .toggle_btn {
   background-color: #0056a3;
@@ -640,9 +654,6 @@ text-align: center;
 
   .navbar {
     padding: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
   }
 
   .section_title {

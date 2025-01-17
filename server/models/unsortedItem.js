@@ -1,16 +1,19 @@
 const mongoose = require("mongoose");
+const { v4: uuidv4 } = require("uuid");
 
 const UnsortedItemSchema = new mongoose.Schema({
-    barcode: { type: String, required: true, unique: true }, // Identitas unik barang
-    nama_barang: { type: String, required: true }, // Nama deskriptif barang
-    wilayah: { type: String, required: true }, // Wilayah tujuan
-    kode_pos: { type: String, required: true }, // Kode pos tujuan
-    alamat: { type: String, required: true }, // Alamat lengkap penerima
-    nomor_telepon: { type: String, required: true }, // Kontak penerima
-    pengirim: { type: String, required: true }, // Nama pengirim barang
-    penerima: { type: String, required: true }, // Nama penerima barang
-    status: { type: String, enum: ["Belum Disortir", "Tersortir"], default: "Belum Disortir" }, // Status barang
-    waktu_masuk: { type: Date, default: Date.now }, // Waktu barang masuk ke sistem
+    barcode: { type: String, unique: true, default: () => `BARCODE-${uuidv4()}` }, // Barcode otomatis
+    nama_barang: { type: String, required: true },
+    wilayah: { type: String, required: true },
+    kode_pos: { type: String, required: true },
+    alamat: { type: String, required: true },
+    nomor_telepon: { type: String, required: true },
+    pengirim: { type: String, required: true },
+    nomor_telepon_pengirim: { type: String, required: true },
+    penerima: { type: String, required: true },
+    nomor_telepon_penerima: { type: String, required: true },
+    status: { type: String, enum: ["Belum Disortir", "Tersortir"], default: "Belum Disortir" },
+    waktu_masuk: { type: Date, default: Date.now },
 });
 
 module.exports = mongoose.model("UnsortedItem", UnsortedItemSchema);

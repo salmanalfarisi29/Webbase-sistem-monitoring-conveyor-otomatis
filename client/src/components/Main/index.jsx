@@ -5,6 +5,7 @@ import styles from "./styles.module.css";
 import polmanLogo from "../../assets/logoPolman.png";
 import jumlahBarangIcon from "../../assets/jumlah_barang_icon.png";
 import pengaturanRpmIcon from "../../assets/pengaturan_rpm_icon.png";
+import barangBelumDisortirIcon from "../../assets/barangBelumDisortirIcon.png";
 import { FaRedo, FaMapMarkerAlt } from "react-icons/fa";
 import useAuthCheck from "../../hooks/useAuthCheck"; // Gunakan path relatif dari folder `components`
 
@@ -121,8 +122,11 @@ const Dashboard = () => {
             navigate("/pengaturan-rpm");
         } else if (page === "jumlahBarang") {
             navigate("/");
+        } else if (page === "barangBelumDisortir") {
+            navigate("/barang-belum-disortir"); 
         }
     };
+    
 
     const resetCounting = (wilayah) => {
         socket.emit("reset-counting", { wilayah });
@@ -146,7 +150,15 @@ const Dashboard = () => {
                         }`}
                         onClick={() => handlePageChange("jumlahBarang")}
                     >
-                        {isSidebarOpen ? "Jumlah Barang" : <img src={jumlahBarangIcon} alt="Jumlah Barang" className={styles.menu_icon} />}
+                        {isSidebarOpen ? "Barang yang Telah Disortir" : <img src={jumlahBarangIcon} alt="Jumlah Barang" className={styles.menu_icon} />}
+                    </li>
+                    <li
+                        className={`${styles.menu_item} ${
+                            isSidebarOpen && activePage === "barangBelumDisortir" ? styles.menu_item_active : ""
+                        }`}
+                        onClick={() => handlePageChange("barangBelumDisortir")}
+                    >
+                        {isSidebarOpen ? "Barang yang Belum Disortir" : <img src={barangBelumDisortirIcon} alt="Barang yang Belum Disortir" className={styles.menu_icon} />}
                     </li>
                     <li
                         className={`${styles.menu_item} ${
@@ -169,7 +181,7 @@ const Dashboard = () => {
                 </nav>
 
                 <div className={styles.content_area}>
-                    <h2 className={styles.section_title}>Jumlah Data Barang</h2>
+                    <h2 className={styles.section_title}>Barang yang Telah Disortir</h2>
                     <div className={styles.card_section}>
                         {/* Jawa Timur */}
                         <div className={`${styles.card_container} ${styles.interactive_card}`}>
